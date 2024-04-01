@@ -1,0 +1,58 @@
+<launch>
+  <arg name="model" />
+  <arg name="gui" default="false" />
+
+  <param name="use_sim_time" value="false"/>
+  <param name="robot_description" textfile="$(find autolabor_description)/urdf/autolabor_mini.urdf" />
+  <param name="use_gui" value="$(arg gui)" />
+
+  <!-- static tf transform -->
+  <include file="$(find tf_broadcast)/launch/tf_static.launch" />
+
+  <!-- virtual odom -->
+  <node pkg="tf_broadcast" type="tf_base" name="tf_base" output="screen">
+    <param name="map_frame" value="map"/>
+    <param name="odom_frame" value="odom"/>
+    <param name="base_link_frame" value="base_link"/>
+    <param name="real_map_frame" value="real_map"/>
+
+    <param name="noise_v_linear" value="0.1"/>
+    <param name="noise_v_theta" value="0.1"/>
+
+    <param name="max_a_linear" value="999.0"/>
+    <param name="max_a_theta" value="999.0"/>
+
+    <param name="max_v_linear" value="1.0"/>
+    <param name="max_v_theta" value="1.57"/>
+
+    <param name="rate" value="100"/>
+  </node>
+
+
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find start_up)/rviz/navigation_without_slam.rviz" />
+
+  <!-- static map -->
+  <node pkg="map_server" type="map_server" name="map_server" args="$(find autolabor_simulation_stage)/map/MG_map.yaml" >
+    <!--remap from="map" to="reserve_map" /-->
+    <!--remap from="map_metadata" to="reserve_map_metadata" /-->
+  </node>
+
+  <arg name="scan_topic"  default="scan" />
+  <arg name="base_frame"  default="base_link"/>
+  <arg name="odom_frame"  default="odom"/>
+
+  <!-- navigation -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find start_up)/param/move_base_params.yaml" command="load" />
+    <rosparam file="$(find start_up)/param/global_costmap_params.yaml" command="load" ns="global_costmap"/>
+    <rosparam file="$(find start_up)/param/local_costmap_params.yaml" command="load" ns="local_costmap"/>
+    <rosparam file="$(find start_up)/param/global_planner_params.yaml" command="load" ns="GlobalPlanner"/>
+    <rosparam file="$(find start_up)/param/dwa_local_planner_params.yaml" command="load" ns="DWAPlannerROS"/>
+  </node>
+
+
+  <!-- drivers for x1-->
+  <node pkg="serial" type="cmd_vel2ackermann" name="cmd_cel2ackermann" />
+</launch>
