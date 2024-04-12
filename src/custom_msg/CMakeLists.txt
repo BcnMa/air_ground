@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  geometry_msgs
+  visualization_msgs
   message_generation
 )
 
@@ -18,12 +20,15 @@ add_message_files(
   FILES
   VehicleCtrlCmd.msg
   VehicleState.msg
+  DronePerception.msg
 )
 
 # 生成消息时依赖于 std_msgs
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
+  visualization_msgs
 )
 
 

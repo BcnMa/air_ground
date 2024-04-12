@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>d2v_serial</name>
+  <name>my_serial</name>
   <version>0.0.0</version>
   <description>The serial package</description>
 

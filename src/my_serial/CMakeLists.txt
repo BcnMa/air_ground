@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(d2v_serial)
+project(my_serial)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -34,12 +34,21 @@ include_directories(
 add_executable(cmd_vel2ackermann src/cmd_vel2ackermann.cpp)
 add_executable(virtual_map src/virtual_map.cpp)
 add_executable(serial_drones src/serial_drones.cpp)
-
+add_executable(pub_perception src/pub_perception.cpp)
+add_executable(serial_vehicle src/serial_vehicle.cpp)
 
 add_dependencies(cmd_vel2ackermann ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(virtual_map ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(serial_drones ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(pub_perception ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(serial_vehicle ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(cmd_vel2ackermann ${catkin_LIBRARIES})
 target_link_libraries(virtual_map ${catkin_LIBRARIES})
 target_link_libraries(serial_drones ${catkin_LIBRARIES})
+target_link_libraries(pub_perception ${catkin_LIBRARIES})
+target_link_libraries(serial_vehicle ${catkin_LIBRARIES})
+
+
+
+

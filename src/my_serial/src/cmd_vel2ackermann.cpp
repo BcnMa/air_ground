@@ -9,7 +9,7 @@ void Cmdvel2Ackermann::cmdvelCallback(const geometry_msgs::Twist::ConstPtr& cmd)
   cmdvel_mutex_.lock();
   custom_msg::VehicleCtrlCmd vehicle_cmd;
 
-  // record cmd_vel
+  // 登记cmd_vel
   vx_ = cmd->linear.x;
   vy_ = cmd->linear.y;
   thz_ = cmd->angular.z;
