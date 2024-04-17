@@ -33,9 +33,9 @@ void Cmdvel2Ackermann::cmdvelCallback(const geometry_msgs::Twist::ConstPtr& cmd)
 void Cmdvel2Ackermann::timerCallback(const ros::TimerEvent& event)
 {
   cmdvel_mutex_.lock();
-  custom_msg::VehicleCtrlCmd vehicle_cmd;
+  //custom_msg::VehicleCtrlCmd vehicle_cmd;
 
-  // driverless_common::VehicleCtrlCmd vehicle_cmd;
+  driverless_common::VehicleCtrlCmd vehicle_cmd;
   if (cmd_vel_x_ > 0.1)
   {
     vehicle_cmd.speed = cmd_vel_x_ * 18 / 5; 
@@ -96,9 +96,9 @@ void Cmdvel2Ackermann::timerCallback(const ros::TimerEvent& event)
 void Cmdvel2Ackermann::run()
 {
   cmdvel_sub_ = nh_.subscribe<geometry_msgs::Twist>("/cmd_vel", 10, &Cmdvel2Ackermann::cmdvelCallback, this);
-  vehicle_cmd_pub_ = nh_.advertise<custom_msg::VehicleCtrlCmd>("/vehicleCmdSet",1);
+  //vehicle_cmd_pub_ = nh_.advertise<custom_msg::VehicleCtrlCmd>("/vehicleCmdSet",1);
   timer_ = nh_.createTimer(ros::Duration(0.01), &Cmdvel2Ackermann::timerCallback, this);
-  // vehicle_cmd_pub_ = nh_.advertise<driverless_common::VehicleCtrlCmd>("/vehicleCmdSet",1);
+  vehicle_cmd_pub_ = nh_.advertise<driverless_common::VehicleCtrlCmd>("/vehicleCmdSet",1);
   ros::spin();
 }
 

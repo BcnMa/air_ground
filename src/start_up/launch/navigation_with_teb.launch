@@ -54,5 +54,5 @@
 
 
   <!-- drivers for x1-->
-  <node pkg="serial" type="cmd_vel2ackermann" name="cmd_cel2ackermann" />
+  <!-- node pkg="my_serial" type="cmd_vel2ackermann" name="cmd_cel2ackermann" /-->
 </launch>

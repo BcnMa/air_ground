@@ -56,7 +56,8 @@
   <build_depend>tf</build_depend>
   <build_depend>custom_msg</build_depend>
   <build_depend>serial</build_depend>
-  
+  <build_depend>driverless_common</build_depend>
+    
   <build_export_depend>nav_msgs</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>rospy</build_export_depend>
@@ -64,7 +65,8 @@
   <build_export_depend>tf</build_export_depend>
   <build_export_depend>custom_msg</build_export_depend>
   <build_export_depend>serial</build_export_depend>
-  
+  <build_export_depend>driverless_common</build_export_depend>
+    
   <exec_depend>nav_msgs</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>rospy</exec_depend>
@@ -72,6 +74,7 @@
   <exec_depend>tf</exec_depend>
   <exec_depend>custom_msg</exec_depend>
   <exec_depend>serial</exec_depend>
+  <exec_depend>driverless_common</exec_depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

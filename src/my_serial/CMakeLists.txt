@@ -15,13 +15,14 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   custom_msg
   serial
+  driverless_common
 )
 
 
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES serial
-   CATKIN_DEPENDS nav_msgs roscpp rospy std_msgs tf custom_msg serial
+   CATKIN_DEPENDS nav_msgs roscpp rospy std_msgs tf custom_msg serial driverless_common
 #  DEPENDS system_lib
 )
 

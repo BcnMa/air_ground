@@ -25,8 +25,8 @@
 #define PURPLE  "\033[35m"
 
 // 以下注释仅在NUC上可运行
-// #include "driverless_common/VehicleCtrlCmd"
-// #include "driverless_common/VehicleState"
+#include "driverless_common/VehicleCtrlCmd.h"
+#include "driverless_common/VehicleState.h"
 
 class Cmdvel2Ackermann
 {
