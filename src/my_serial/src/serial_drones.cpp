@@ -40,20 +40,24 @@ public:
     {
         visualization_msgs::MarkerArray empty_marker_array;
         custom_msg::DronePerception my_data_msg;
+        std::string start_msg = "start";
+        std::string end_msg = "end";
         my_data_msg.header = data.header;
         my_data_msg.vehicle_position = data.vehicle_position;
         my_data_msg.vehicle_attitude = data.vehicle_attitude;
         my_data_msg.obstacle_markers = data.obstacle_markers;
-
-        uint32_t serial_size = ros::serialization::serializationLength(my_data_msg);
-        boost::shared_array<uint8_t> buffer(new uint8_t[serial_size]);
-        ros::serialization::OStream stream(buffer.get(), serial_size);
-        ros::serialization::serialize(stream, my_data_msg);
         
-        buffer[serial_size - 1] = '\r';
-        buffer[serial_size] = '\n';
-        drone_serial_.write(buffer.get(), serial_size + 1);
+        std::ostringstream oss;
+        oss << start_msg << " " << data.obstacle_markers.markers.size() << " "
+        << data.header.seq << " " << data.header.frame_id << " "
+        << data.vehicle_position.x << " " << data.vehicle_position.y << " " << data.vehicle_position.z << " "
+        << data.vehicle_attitude.x << " " << data.vehicle_attitude.y << " " << data.vehicle_attitude.z << " " << data.vehicle_attitude.w << " "
+        << end_msg;
+        std::string send_msg = oss.str();
 
+        // 把send_msg用drone_serial_.write发送出去
+        drone_serial_.write(send_msg);
+        
         std::cout << "----------Drone send new message----------" << std::endl;
         std::cout << "Header: " << YELLOW << std::endl << data.header << RESET << std::endl;
         std::cout << "Vehicle Position: " << GREEN << std::endl << data.vehicle_position << RESET << std::endl;

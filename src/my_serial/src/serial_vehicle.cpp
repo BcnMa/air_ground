@@ -43,38 +43,71 @@ public:
 
     /*
     * 读取串口数据
-    */ 
-    void readSerialData()
+    */
+    bool readSerialData()
     {
         if (vehicle_serial_.available())
         {
-            visualization_msgs::MarkerArray empty_marker_array;
             std::string data = vehicle_serial_.read(vehicle_serial_.available());
             std::cout << "----------Vehicle received new message----------" << std::endl;
-            std::cout << ("Received data: %s", data.c_str()) << std::endl;
+            std::cout << "Received Message: " << data << std::endl;
 
-            size_t data_length = data.length();
-            if (data_length > 0)
+            data_buffer_ += data;  
+
+            size_t start_pos = data_buffer_.find("start");
+            size_t end_pos = data_buffer_.find("end");
+
+            if (start_pos != std::string::npos && end_pos != std::string::npos && start_pos < end_pos)
             {
-                data.erase(std::remove(data.begin(), data.end(), '\r'), data.end());
-                std::vector<uint8_t> buffer(data.begin(), data.end());
-                custom_msg::DronePerception received_msg;
-                uint32_t serial_size = buffer.size();
-                ros::serialization::IStream stream(buffer.data(), serial_size);
-                ros::serialization::deserialize(stream, received_msg);
+                std::string message = data_buffer_.substr(start_pos, end_pos + 3 - start_pos);  
 
-                // std::cout << "----------Drone send new message----------" << std::endl;
+                std::istringstream iss(message);
+                std::string header;
+                int num_obstacle_markers;
+
+                iss >> header;  
+
+                if (header != "start")
+                {
+                    std::cout << RED << "Header is not correct!" << RESET << std::endl;
+                    return false;
+                }
+
+                iss >> num_obstacle_markers;
+
+                custom_msg::DronePerception received_msg;
+                received_msg.header.stamp = ros::Time::now();
+                iss >> received_msg.header.seq;
+                iss >> received_msg.header.frame_id;
+
+                iss >> received_msg.vehicle_position.x;
+                iss >> received_msg.vehicle_position.y;
+                iss >> received_msg.vehicle_position.z;
+
+                iss >> received_msg.vehicle_attitude.x;
+                iss >> received_msg.vehicle_attitude.y;
+                iss >> received_msg.vehicle_attitude.z;
+                iss >> received_msg.vehicle_attitude.w;
+
                 std::cout << "Header: " << YELLOW << std::endl << received_msg.header << RESET << std::endl;
                 std::cout << "Vehicle Position: " << GREEN << std::endl << received_msg.vehicle_position << RESET << std::endl;
                 std::cout << "Vehicle Attitude: " << BLUE << std::endl << received_msg.vehicle_attitude << RESET << std::endl;
-                std::cout << "Obstacle Markers: " << PURPLE << std::endl;
-                if (received_msg.obstacle_markers == empty_marker_array) 
-                    std::cout << "No Obstacle!" << RESET << std::endl;        
+
+                if (num_obstacle_markers == 0)
+                    std::cout << "No Obstacle!" << std::endl;
                 else
-                    std::cout << "Number of Obstacle Markers: " << received_msg.obstacle_markers.markers.size() << RESET << std::endl;
+                    std::cout << "Number of Obstacle Markers: " << PURPLE << num_obstacle_markers << std::endl;
+
                 std::cout << std::endl;
 
-                buffer.clear();
+                // 从缓冲区中移除已处理的消息
+                data_buffer_ = data_buffer_.substr(end_pos + 3);
+                return true;
+            }
+            else
+            {
+                std::cout << RED << "Data is not complete " << RESET << std::endl;
+                return false;
             }
         }
     }
@@ -96,6 +129,7 @@ private:
     serial::Serial vehicle_serial_;
     serial::Timeout time_;
     int dataPublishNum = 0;
+    std::string data_buffer_;  
 };
 
 int main(int argc, char **argv)
