@@ -8,10 +8,14 @@
 
 
 ## 调试记录
-### 20230401
+
+### 20240402 - 20240425
+ - 代码已经传到git，在此不再记录
+ 
+### 20240401
  - 加入teb_local_planner
 
-### 20230304
+### 20240304
  - 创建工作空间.
  - 引入适配18.04的navigation源码.
  - 引入gmapping所需源码,共5个功能包,分别是slam文件夹下的geometry2,openslam_gmapping,slam_gmapping以及上述navigation和navigation_msgs,其中navigation_msgs是独立于navigation的包,我把它放入navigation.
