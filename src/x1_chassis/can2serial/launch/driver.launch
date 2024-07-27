@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="port" default="/dev/ttyUSB0"/>
+    <arg name="baudrate" default="500"/>
+
+    <node name="canmsg_transmitter_node" pkg="can2serial" type="msg_transmitter" output="screen">
+        <param name="usb_port" value="$(arg port)"/>
+        <param name="baud_rate" value="$(arg baudrate)"/>
+    </node>
+</launch>

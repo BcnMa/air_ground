@@ -1,0 +1,19 @@
+
+vehicle:
+   max_roadwheel_angle: 23   # degree
+   min_roadwheel_angle: -23   # degree
+   min_steering_radius:  5.0    # m
+   max_steering_speed: 180.0    # deg/s
+   max_speed:   10.0            # km/h
+   min_speed:   2.5             # km/h
+   wheel_base:  1.1             # m
+   wheel_track: 0.8             # m
+   width:       0.99            # m
+   length:      2.163             # m
+
+   max_deceleration: 6.0        # m/s2 xxx
+   max_acceleration: 2.0        # m/s2
+   speed_control_period: 0.02   # s
+   steer_control_period: 0.02   # s
+   max_side_acceleration: 2.0
+

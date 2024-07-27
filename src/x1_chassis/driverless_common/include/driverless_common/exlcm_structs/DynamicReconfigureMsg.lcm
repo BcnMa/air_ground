@@ -1,0 +1,14 @@
+package exlcm;
+
+struct DynamicReconfigureMsg
+{
+    string config_channel;
+	string server;
+	string label;
+
+    int32_t param_cnt;
+	string param_names[param_cnt];
+	int8_t param_types[param_cnt];
+	string params[param_cnt];
+}
+

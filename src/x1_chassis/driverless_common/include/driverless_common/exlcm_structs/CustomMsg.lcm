@@ -1,0 +1,13 @@
+package exlcm;
+
+struct CustomMsg
+{
+	string sender;
+	string label;
+	
+	int32_t data_cnt;
+	string data_names[data_cnt];
+	string data_units[data_cnt];
+	float datas[data_cnt];
+}
+

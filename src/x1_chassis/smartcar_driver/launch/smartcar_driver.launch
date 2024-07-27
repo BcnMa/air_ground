@@ -1,0 +1,13 @@
+<!-- -->
+<launch>
+
+    <node name="base_control_node" pkg="smartcar_driver" type="base_control_node" respawn="false" output="screen">
+        <param name ="obd_can_port_name" value="/dev/can"/>
+        <param name ="speed_pid_kp" value="6.95"/>  <!--3.3  6.85-->
+        <param name ="speed_pid_ki" value="1.20"/>
+        <param name ="speed_pid_kd" value="0.0"/>
+        <param name ="speed_pid_max_err" value="0.0"/>
+
+    </node>
+    
+</launch>

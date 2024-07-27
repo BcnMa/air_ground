@@ -9,13 +9,11 @@
 
 #include "vector"
 #include "nav_msgs/Odometry.h"
-#include "tf/transform_datatypes.h"
-#include "tf/tf.h"
+#include <tf2_ros/transform_listener.h>
+#include <tf2_ros/transform_broadcaster.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include "geometry_msgs/Polygon.h"
 #include "nav_msgs/OccupancyGrid.h"
-
-#include "custom_msg/VehicleCtrlCmd.h"
-#include "custom_msg/VehicleState.h"
 
 #define LR          0.5   // rear suspension deistance
 #define LF          0.5   // front suspension deistance
@@ -28,14 +26,17 @@
 #define BLUE    "\033[34m"
 #define PURPLE  "\033[35m"
 
-// 以下注释仅在NUC上可运行
-// #include "driverless_common/VehicleCtrlCmd.h"
-// #include "driverless_common/VehicleState.h"
+#include "driverless_common/VehicleCtrlCmd.h"
+#include "driverless_common/VehicleState.h"
+
+// 仅在没有driverless_common包的情况下使用
+// #include "custom_msg/VehicleCtrlCmd.h"
+// #include "custom_msg/VehicleState.h"
 
 class PubOdom
 {
 public:
-  PubOdom()
+  PubOdom() : tf_listener_(tf_buffer_)
   {
     nh_.param("odom_frame", odom_frame_, std::string("odom"));
     nh_.param("base_link_frame", base_link_frame_, std::string("base_link"));  
@@ -65,7 +66,7 @@ public:
     odom_trans.transform.translation.x = odom_x_;
     odom_trans.transform.translation.y = odom_y_;
     odom_trans.transform.translation.z = 0.0;
-    odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(odom_th_);
+    odom_trans.transform.rotation = tf2::toMsg(tf2::Quaternion(0, 0, odom_th_));
 
     tf_broadcaster_.sendTransform(odom_trans);
 
@@ -90,21 +91,26 @@ public:
 
   void updateOdometry()
   {
+    state_mutex_.lock();
+
     double dt = (current_time_ - last_time_).toSec();
 
-    state_mutex_.lock();
-    // 根据我的变量，写一个简单的里程计
     double v = vehicle_speed_ / 3.6; // km/h -> m/s
     double w = roadwheel_angle_ * M_PI / 180.0; // degree -> rad
 
-    double dth = tan(w) * v;
-    double delta_x = (v * cos(w)) * dt;
-    double delta_y = (v * sin(w)) * dt;
+    double delta_theta = v * tan(w) * dt;
+    double delta_x = v * cos(odom_th_) * dt;
+    double delta_y = v * sin(odom_th_) * dt;
+
     cur_v_linear_ = v;
-    cur_v_theta_ = dth/dt;
+    cur_v_theta_ = delta_theta / dt;
     odom_x_ += delta_x;
     odom_y_ += delta_y;
-    odom_th_ += delta_th;
+    odom_th_ += delta_theta;
+
+    last_time_ = current_time_;
+
+    state_mutex_.unlock();
   }
 
 
@@ -112,7 +118,7 @@ public:
   void run()
   {
     // state_sub_ = nh_.subscribe<custom_msg::VehicleState>("vehicleStateSet", 10, &PubOdom::stateReceived, this);
-    state_sub_ = nh_.subscribe<driverless_common::VehicleState>("vehicleStateSet", 10, &PubOdom::stateReceived, this);
+    state_sub_ = nh_.subscribe("vehicleStateSet", 10, &PubOdom::stateReceived, this);
     odom_pub_ = nh_.advertise<nav_msgs::Odometry>("odom", 1000);
     pub_odom_timer_ = nh_.createTimer(ros::Duration(1.0/rate_), &PubOdom::pubOdomCallback, this);
     ros::spin();
@@ -136,8 +142,9 @@ private:
   double cur_v_theta_ = 0.0;
   boost::mutex state_mutex_;
 
-  tf::TransformListener tf_listener_;
-  tf::TransformBroadcaster tf_broadcaster_;
+  tf2_ros::Buffer tf_buffer_;
+  tf2_ros::TransformListener tf_listener_;
+  tf2_ros::TransformBroadcaster tf_broadcaster_;
 
   std::string odom_frame_, base_link_frame_;
 };
