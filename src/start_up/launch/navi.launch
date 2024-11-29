@@ -1,0 +1,41 @@
+<launch>
+  <arg name="model" />
+  <arg name="gui" default="false" />
+
+  <param name="use_sim_time" value="false"/>
+  <param name="robot_description" textfile="$(find autolabor_description)/urdf/autolabor_mini.urdf" />
+  <param name="use_gui" value="$(arg gui)" />
+
+  <!-- static tf transform -->
+  <include file="$(find tf_broadcast)/launch/tf_static.launch" />
+
+  <!-- wheel odom -->
+  <node pkg="my_serial" type="pub_odom" name="pub_odom" output="screen"/>
+
+  <!-- drivers for x1-->
+  <node pkg="my_serial" type="cmd_vel2ackermann" name="cmd_cel2ackermann" />
+
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find start_up)/rviz/navigation_with_teb.rviz" /> -->
+  <!-- <node name="rviz" pkg="rviz" type="rviz"/>  -->
+  
+  <!-- static map -->
+  <node pkg="map_server" type="map_server" name="map_server" args="$(find start_up)/map/100boundary.yaml" >
+    <!--remap from="map" to="reserve_map" /-->
+    <!--remap from="map_metadata" to="reserve_map_metadata" /-->
+  </node>
+
+  <arg name="scan_topic"  default="scan" />
+  <arg name="base_frame"  default="base_link"/>
+  <arg name="odom_frame"  default="odom"/>
+
+  <!-- navigation -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find start_up)/param/move_base_params.yaml" command="load" />
+    <rosparam file="$(find start_up)/param/global_costmap_params.yaml" command="load" ns="global_costmap"/>
+    <rosparam file="$(find start_up)/param/local_costmap_params.yaml" command="load" ns="local_costmap"/>
+    <rosparam file="$(find start_up)/param/global_planner_params.yaml" command="load" ns="GlobalPlanner"/>
+    <rosparam file="$(find start_up)/param/teb_local_planner_params.yaml" command="load" ns="TebLocalPlannerROS"/>
+  </node>
+</launch>
